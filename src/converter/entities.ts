@@ -17,14 +17,14 @@ export const getAccountEntity = (instance: any): Entity => ({
 });
 
 export const getServiceEntity = (instance: any): Entity => ({
-  _key: `bugcrowd:service:${instance.id}:mast`,
+  _key: `bugcrowd:service:${instance.id}:bug-bounty`,
   _type: 'bugcrowd_service',
-  _class: ['Service'],
+  _class: ['Service', 'Control'],
   name: 'BugCrowd Security Testing',
   displayName: 'BugCrowd Security Testing',
   description: 'Crowd-sourced security testing',
   category: 'software',
-  function: 'AppSec',
+  function: ['appsec', 'bug-bounty', 'pen-test'],
 });
 
 export const convertBounty = (
@@ -37,10 +37,11 @@ export const convertBounty = (
         ...convertProperties(data),
         _key: `bugcrowd-bounty:${data.uuid}`,
         _type: 'bugcrowd_bounty',
-        _class: ['Program'],
+        _class: ['Program', 'Control'],
         name: data.scan_profile_name,
         displayName: data.scan_profile_name,
         type: 'bug-bounty',
+        function: 'bug-bounty',
         description: data.description_markdown,
         descriptionMarkdown: undefined,
         overview: data.targets_overview,
