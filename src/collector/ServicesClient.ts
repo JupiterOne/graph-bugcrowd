@@ -31,7 +31,7 @@ export class ServicesClient {
     };
   }
 
-  test(): Promise<any[]> {
+  test(): Promise<unknown> {
     return this.fetch('bounties', { offset: '0', limit: '1' });
   }
 
