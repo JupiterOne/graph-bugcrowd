@@ -24,7 +24,9 @@ The following relationships are created:
 
 | From               | Relationship | To                    |
 | ------------------ | ------------ | --------------------- |
+| `bugcrowd_account` | **HAS**      | `bugcrowd_service`    |
 | `bugcrowd_account` | **HAS**      | `bugcrowd_bounty`     |
+| `bugcrowd_service` | **MANAGES**  | `bugcrowd_bounty`     |
 | `bugcrowd_bounty`  | **HAS**      | `bugcrowd_submission` |
 
 The following relationships are mapped:
