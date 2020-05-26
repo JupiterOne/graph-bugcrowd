@@ -9,31 +9,49 @@ import {
   convertBounty,
   convertFinding,
   getAccountEntity,
+  getServiceEntity,
 } from '../../converter';
 
 const step: IntegrationStep = {
   id: 'fetch-all',
   name: `Fetch BugCrowd bounties and submissions`,
-  types: ['bugcrowd_bounty', 'bugcrowd_submission'],
+  types: [
+    'bugcrowd_account',
+    'bugcrowd_bounty',
+    'bugcrowd_submission',
+    'bugcrowd_account_has_bounty',
+    'bugcrowd_service_manages_bounty',
+    'bugcrowd_bounty_has_submission',
+  ],
   async executionHandler({
     instance,
     jobState,
   }: IntegrationStepExecutionContext) {
     const client = createServicesClient(instance);
     const accountEntity = getAccountEntity(instance);
-    await jobState.addEntity(accountEntity);
+    const serviceEntity = getServiceEntity(instance);
 
     const bounties = (await client.getBounties()).bounties;
     const bountyEntities = bounties.map(convertBounty);
     await jobState.addEntities(bountyEntities);
 
-    const bountyRelationships = bountyEntities.map((bountyEntity) =>
-      createIntegrationRelationship({
-        from: accountEntity,
-        to: bountyEntity,
-        _class: 'HAS',
-      }),
-    );
+    const bountyRelationships = [];
+    bountyEntities.forEach((bountyEntity) => {
+      bountyRelationships.push(
+        createIntegrationRelationship({
+          from: accountEntity,
+          to: bountyEntity,
+          _class: 'HAS',
+        }),
+      );
+      bountyRelationships.push(
+        createIntegrationRelationship({
+          from: serviceEntity,
+          to: bountyEntity,
+          _class: 'MANAGES',
+        }),
+      );
+    });
     await jobState.addRelationships(bountyRelationships);
 
     for (const bountyEntity of bountyEntities) {
