@@ -14,7 +14,7 @@ import {
 
 const step: IntegrationStep = {
   id: 'fetch-all',
-  name: `Fetch BugCrowd bounties and submissions`,
+  name: `Fetch Bugcrowd bounties and submissions`,
   types: [
     'bugcrowd_account',
     'bugcrowd_bounty',
