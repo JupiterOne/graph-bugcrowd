@@ -8,7 +8,7 @@ import { getAccountEntity, getServiceEntity } from '../../converter';
 
 const step: IntegrationStep = {
   id: 'fetch-account',
-  name: 'Fetch BugCrowd account and service',
+  name: 'Fetch Bugcrowd account and service',
   types: [
     'bugcrowd_account',
     'bugcrowd_service',

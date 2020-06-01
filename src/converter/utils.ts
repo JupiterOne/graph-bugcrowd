@@ -1,4 +1,4 @@
-// BugCrowd severity/priority is rated between 1-5
+// Bugcrowd severity/priority is rated between 1-5
 // https://www.bugcrowd.com/blog/vulnerability-prioritization-at-bugcrowd/
 export function getSeverity(priority: number | undefined): string | undefined {
   if (priority === 1) {
