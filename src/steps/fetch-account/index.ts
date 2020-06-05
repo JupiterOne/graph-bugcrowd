@@ -1,6 +1,5 @@
 import {
   IntegrationStep,
-  IntegrationStepExecutionContext,
   createIntegrationRelationship,
 } from '@jupiterone/integration-sdk-core';
 
@@ -18,7 +17,7 @@ const step: IntegrationStep<ServicesClientInput> = {
   async executionHandler({
     instance,
     jobState,
-  }: IntegrationStepExecutionContext) {
+  }) {
     const accountEntity = getAccountEntity(instance);
     await jobState.addEntity(accountEntity);
 
