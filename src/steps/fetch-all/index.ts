@@ -2,6 +2,7 @@ import {
   IntegrationStep,
   IntegrationStepExecutionContext,
   createIntegrationRelationship,
+  Relationship,
 } from '@jupiterone/integration-sdk-core';
 
 import { createServicesClient } from '../../collector';
@@ -11,9 +12,9 @@ import {
   getAccountEntity,
   getServiceEntity,
 } from '../../converter';
-import { ServicesClientInput } from 'src/collector/ServicesClient';
+import { ServicesClientInput } from '../../collector/ServicesClient';
 
-const step: IntegrationStep = {
+const step: IntegrationStep<ServicesClientInput> = {
   id: 'fetch-all',
   name: `Fetch Bugcrowd bounties and submissions`,
   types: [
@@ -36,7 +37,7 @@ const step: IntegrationStep = {
     const bountyEntities = bounties.map(convertBounty);
     await jobState.addEntities(bountyEntities);
 
-    const bountyRelationships = [];
+    const bountyRelationships: Relationship[] = [];
     bountyEntities.forEach((bountyEntity) => {
       bountyRelationships.push(
         createIntegrationRelationship({

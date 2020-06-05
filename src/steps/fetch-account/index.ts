@@ -5,8 +5,9 @@ import {
 } from '@jupiterone/integration-sdk-core';
 
 import { getAccountEntity, getServiceEntity } from '../../converter';
+import { ServicesClientInput } from '../../collector/ServicesClient';
 
-const step: IntegrationStep = {
+const step: IntegrationStep<ServicesClientInput> = {
   id: 'fetch-account',
   name: 'Fetch Bugcrowd account and service',
   types: [
