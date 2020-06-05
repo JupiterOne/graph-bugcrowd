@@ -6,9 +6,9 @@ import { ServicesClient, ServicesClientInput } from './ServicesClient';
  * api key.
  */
 export function createServicesClient(
-  instance: IntegrationInstance,
+  instance: IntegrationInstance<ServicesClientInput>,
 ): ServicesClient {
-  const { apiToken } = instance.config as ServicesClientInput;
+  const { apiToken } = instance.config;
 
   if (!apiToken) {
     throw new Error(

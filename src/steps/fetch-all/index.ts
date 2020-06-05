@@ -11,6 +11,7 @@ import {
   getAccountEntity,
   getServiceEntity,
 } from '../../converter';
+import { ServicesClientInput } from 'src/collector/ServicesClient';
 
 const step: IntegrationStep = {
   id: 'fetch-all',
@@ -26,7 +27,7 @@ const step: IntegrationStep = {
   async executionHandler({
     instance,
     jobState,
-  }: IntegrationStepExecutionContext) {
+  }: IntegrationStepExecutionContext<ServicesClientInput>) {
     const client = createServicesClient(instance);
     const accountEntity = getAccountEntity(instance);
     const serviceEntity = getServiceEntity(instance);
