@@ -1,8 +1,8 @@
 import {
   IntegrationStep,
-  IntegrationStepExecutionContext,
   createIntegrationRelationship,
-} from '@jupiterone/integration-sdk';
+  Relationship,
+} from '@jupiterone/integration-sdk-core';
 
 import { createServicesClient } from '../../collector';
 import {
@@ -11,8 +11,9 @@ import {
   getAccountEntity,
   getServiceEntity,
 } from '../../converter';
+import { ServicesClientInput } from '../../collector/ServicesClient';
 
-const step: IntegrationStep = {
+const step: IntegrationStep<ServicesClientInput> = {
   id: 'fetch-all',
   name: `Fetch Bugcrowd bounties and submissions`,
   types: [
@@ -26,7 +27,7 @@ const step: IntegrationStep = {
   async executionHandler({
     instance,
     jobState,
-  }: IntegrationStepExecutionContext) {
+  }) {
     const client = createServicesClient(instance);
     const accountEntity = getAccountEntity(instance);
     const serviceEntity = getServiceEntity(instance);
@@ -35,7 +36,7 @@ const step: IntegrationStep = {
     const bountyEntities = bounties.map(convertBounty);
     await jobState.addEntities(bountyEntities);
 
-    const bountyRelationships = [];
+    const bountyRelationships: Relationship[] = [];
     bountyEntities.forEach((bountyEntity) => {
       bountyRelationships.push(
         createIntegrationRelationship({

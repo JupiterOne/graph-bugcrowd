@@ -1,12 +1,12 @@
 import {
   IntegrationStep,
-  IntegrationStepExecutionContext,
   createIntegrationRelationship,
-} from '@jupiterone/integration-sdk';
+} from '@jupiterone/integration-sdk-core';
 
 import { getAccountEntity, getServiceEntity } from '../../converter';
+import { ServicesClientInput } from '../../collector/ServicesClient';
 
-const step: IntegrationStep = {
+const step: IntegrationStep<ServicesClientInput> = {
   id: 'fetch-account',
   name: 'Fetch Bugcrowd account and service',
   types: [
@@ -17,7 +17,7 @@ const step: IntegrationStep = {
   async executionHandler({
     instance,
     jobState,
-  }: IntegrationStepExecutionContext) {
+  }) {
     const accountEntity = getAccountEntity(instance);
     await jobState.addEntity(accountEntity);
 
