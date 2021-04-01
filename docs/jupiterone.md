@@ -8,6 +8,24 @@ and findings.
 
 Configure the integration by providing an API Token from your Bugcrowd account.
 
+## Bugcrowd + JupiterOne Integration Benefits
+
+- Visualize Bugcrowd bounty programs and submitted findings in the JupiterOne
+  graph.
+- Monitor Bugcrowd findings within the alerts app.
+- Monitor changes to Bugcrowd bounty programs using JupiterOne alerts.
+
+## How it Works
+
+- JupiterOne periodically fetches changes to programs and new findings from
+  Bugcrowd to update the graph.
+- Configure alerts to reduce the noise of submitted findings.
+
+## Requirements
+
+- JupiterOne requires a Bugcrowd API Token to interact with the API.
+- You must have permission in JupiterOne to install new integrations.
+
 ## Entities
 
 The following entity resources are ingested when the integration runs.
