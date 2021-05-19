@@ -44,6 +44,7 @@ export async function fetchBounties({
 export async function fetchBountySubmissions({
   instance,
   jobState,
+  logger,
 }: IntegrationStepExecutionContext<IntegrationConfig>) {
   const client = new ServicesClient({ apiToken: instance.config.apiToken });
 
@@ -55,6 +56,12 @@ export async function fetchBountySubmissions({
       const bountyId = bountyEntity.uuid as string | undefined;
 
       if (!bountyId) {
+        logger.warn(
+          {
+            _key: bountyEntity._key,
+          },
+          'Bounty entity does not have "uuid" property. Skipping.',
+        );
         return;
       }
 

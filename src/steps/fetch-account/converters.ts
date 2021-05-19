@@ -32,10 +32,7 @@ export function createServiceEntity(instance: IntegrationInstance): Entity {
         displayName: 'Bugcrowd Security Testing',
         description: 'Crowd-sourced security testing',
         category: ['security', 'software'],
-        function: 'bug-bounty',
-        // TODO: Update this after the data-model has been updated to support
-        // arrays for `function`
-        // function: ['appsec', 'bug-bounty', 'pen-test'],
+        function: ['appsec', 'bug-bounty', 'pen-test'],
       },
     },
   });
