@@ -1,36 +1,26 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   createIntegrationEntity,
-  getTime,
-  convertProperties,
   Entity,
+  parseTimePropertyValue,
+  convertProperties,
 } from '@jupiterone/integration-sdk-core';
-import { getSeverity } from './utils';
 
-export const getAccountEntity = (instance: any): Entity => ({
-  _key: `bugcrowd:account:${instance.id}`,
-  _type: 'bugcrowd_account',
-  _class: ['Account'],
-  name: instance.name,
-  displayName: instance.name,
-  description: instance.description,
-});
+// Bugcrowd severity/priority is rated between 1-5
+// https://www.bugcrowd.com/blog/vulnerability-prioritization-at-bugcrowd/
+const PRIORITY_TO_SEVERITY_MAP = new Map<number, string>([
+  [1, 'critical'],
+  [2, 'high'],
+  [3, 'medium'],
+  [4, 'low'],
+  [5, 'info'],
+]);
 
-export const getServiceEntity = (instance: any): Entity => ({
-  _key: `bugcrowd:service:${instance.id}:bug-bounty`,
-  _type: 'bugcrowd_service',
-  _class: ['Service', 'Control'],
-  name: 'Bugcrowd Security Testing',
-  displayName: 'Bugcrowd Security Testing',
-  description: 'Crowd-sourced security testing',
-  category: 'software',
-  function: ['appsec', 'bug-bounty', 'pen-test'],
-});
+function getSeverity(priority: number) {
+  return PRIORITY_TO_SEVERITY_MAP.get(priority) || 'critical';
+}
 
-export const convertBounty = (
-  data: any,
-): ReturnType<typeof createIntegrationEntity> =>
-  createIntegrationEntity({
+export function createBountyEntity(data: any): Entity {
+  return createIntegrationEntity({
     entityData: {
       source: data,
       assign: {
@@ -46,19 +36,18 @@ export const convertBounty = (
         descriptionMarkdown: undefined,
         overview: data.targets_overview,
         targetsOverview: undefined,
-        createdOn: getTime(data.starts_at),
-        startedOn: getTime(data.starts_at),
-        stoppedOn: getTime(data.ends_at),
+        createdOn: parseTimePropertyValue(data.starts_at),
+        startedOn: parseTimePropertyValue(data.starts_at),
+        stoppedOn: parseTimePropertyValue(data.ends_at),
         active: data.status === 'live',
         webLink: `https://tracker.bugcrowd.com/${data.code}`,
         internal: false,
       },
     },
   });
+}
 
-export const convertFinding = (
-  data: any,
-): ReturnType<typeof createIntegrationEntity> => {
+export function createBountySubmissionEntity(data: any) {
   return createIntegrationEntity({
     entityData: {
       source: data,
@@ -74,7 +63,7 @@ export const convertFinding = (
         descriptionMarkdown: undefined,
         details: data.extra_info_markdown,
         extraInfoMarkdown: undefined,
-        createdOn: getTime(data.submitted_at),
+        createdOn: parseTimePropertyValue(data.submitted_at),
         references: data.vulnerability_references_markdown,
         vulnerabilityReferencesMarkdown: undefined,
         numericSeverity: data.priority,
@@ -90,4 +79,4 @@ export const convertFinding = (
       },
     },
   });
-};
+}

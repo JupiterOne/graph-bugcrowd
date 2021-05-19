@@ -1,37 +1,45 @@
 import {
   IntegrationStep,
-  createIntegrationRelationship,
+  createDirectRelationship,
+  RelationshipClass,
+  IntegrationStepExecutionContext,
 } from '@jupiterone/integration-sdk-core';
 
-import { getAccountEntity, getServiceEntity } from '../../converter';
-import { ServicesClientInput } from '../../collector/ServicesClient';
+import { createAccountEntity, createServiceEntity } from './converters';
+import { IntegrationConfig } from '../../config';
+import { Entities, IntegrationSteps, Relationships } from '../constants';
+import {
+  ACCOUNT_ENTITY_JOB_STATE_KEY,
+  SERVICE_ENTITY_JOB_STATE_KEY,
+} from '../../util/jobState';
 
-const step: IntegrationStep<ServicesClientInput> = {
-  id: 'fetch-account',
-  name: 'Fetch Bugcrowd account and service',
-  types: [
-    'bugcrowd_account',
-    'bugcrowd_service',
-    'bugcrowd_account_provides_service',
-  ],
-  async executionHandler({
-    instance,
-    jobState,
-  }) {
-    const accountEntity = getAccountEntity(instance);
-    await jobState.addEntity(accountEntity);
+export async function fetchAccount({
+  instance,
+  jobState,
+}: IntegrationStepExecutionContext<IntegrationConfig>) {
+  const accountEntity = await jobState.addEntity(createAccountEntity(instance));
+  const serviceEntity = await jobState.addEntity(createServiceEntity(instance));
 
-    const serviceEntity = getServiceEntity(instance);
-    await jobState.addEntity(serviceEntity);
+  // Cache the account and service entities for quick access later. Both are used
+  // accross multiple steps
+  await jobState.setData(ACCOUNT_ENTITY_JOB_STATE_KEY, accountEntity);
+  await jobState.setData(SERVICE_ENTITY_JOB_STATE_KEY, serviceEntity);
 
-    await jobState.addRelationship(
-      createIntegrationRelationship({
-        from: accountEntity,
-        to: serviceEntity,
-        _class: 'PROVIDES',
-      }),
-    );
+  await jobState.addRelationship(
+    createDirectRelationship({
+      _class: RelationshipClass.PROVIDES,
+      from: accountEntity,
+      to: serviceEntity,
+    }),
+  );
+}
+
+export const accountSteps: IntegrationStep<IntegrationConfig>[] = [
+  {
+    id: IntegrationSteps.ACCOUNT,
+    name: 'Fetch Account',
+    entities: [Entities.ACCOUNT, Entities.SERVICE],
+    relationships: [Relationships.ACCOUNT_PROVIDES_SERVICE],
+    executionHandler: fetchAccount,
   },
-};
-
-export default step;
+];
