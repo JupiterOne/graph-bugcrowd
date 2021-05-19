@@ -1,14 +1,15 @@
 import { IntegrationInvocationConfig } from '@jupiterone/integration-sdk-core';
-
-import instanceConfigFields from './instanceConfigFields';
-import validateInvocation from './validateInvocation';
-
-import fetchAccount from './steps/fetch-account';
-import fetchAll from './steps/fetch-all';
-import { ServicesClientInput } from './collector/ServicesClient';
-
-export const invocationConfig: IntegrationInvocationConfig<ServicesClientInput> = {
+import {
   instanceConfigFields,
+  IntegrationConfig,
   validateInvocation,
-  integrationSteps: [fetchAccount, fetchAll],
-};
+} from './config';
+import { accountSteps } from './steps/fetch-account';
+import { bountySteps } from './steps/fetch-bounties';
+
+export const invocationConfig: IntegrationInvocationConfig<IntegrationConfig> =
+  {
+    instanceConfigFields,
+    validateInvocation,
+    integrationSteps: [...accountSteps, ...bountySteps],
+  };

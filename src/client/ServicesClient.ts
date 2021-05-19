@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { retry } from '@lifeomic/attempt';
-import nodeFetch, { Request } from 'node-fetch';
+import nodeFetch, { Request, Response } from 'node-fetch';
 
 import { retryableRequestError, fatalRequestError } from './error';
 import { URLSearchParams } from 'url';
@@ -35,15 +34,26 @@ export class ServicesClient {
     return this.fetch('bounties', { offset: '0', limit: '1' });
   }
 
-  getBounties(): Promise<any> {
-    return this.fetch('bounties');
+  async iterateBounties(fn: (bounty: any) => Promise<void>): Promise<void> {
+    const result = await this.fetch<any>('bounties');
+
+    for (const bounty of result.bounties) {
+      await fn(bounty);
+    }
   }
 
-  getSubmissions(bounty: string): Promise<any> {
-    return this.fetch(`bounties/${bounty}/submissions/`);
+  async iterateBountySubmissions(
+    bountyId: string,
+    fn: (submission: any) => Promise<void>,
+  ): Promise<void> {
+    const result = await this.fetch<any>(`bounties/${bountyId}/submissions/`);
+
+    for (const submission of result.submissions) {
+      await fn(submission);
+    }
   }
 
-  fetch<T = object>(
+  fetch<T>(
     url: string,
     queryParams: QueryParam = {},
     request?: Omit<Request, 'url'>,
@@ -62,11 +72,8 @@ export class ServicesClient {
           },
         );
 
-        /**
-         * We are working with a json api, so just return the parsed data.
-         */
         if (response.ok) {
-          return response.json() as T;
+          return (await response.json()) as T;
         }
 
         if (isRetryableRequest(response)) {
