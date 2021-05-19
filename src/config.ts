@@ -33,7 +33,7 @@ export async function validateInvocation(
   } catch (err) {
     throw new IntegrationProviderAuthenticationError({
       cause: err,
-      endpoint: 'api.bugcrowd.com',
+      endpoint: 'api.bugcrowd.com/bounties',
       status: 401,
       statusText: err.toString(),
     });
