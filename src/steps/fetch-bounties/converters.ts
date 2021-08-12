@@ -4,6 +4,7 @@ import {
   parseTimePropertyValue,
   convertProperties,
 } from '@jupiterone/integration-sdk-core';
+import { Bounty, BountySubmission } from '../../types';
 
 // Bugcrowd severity/priority is rated between 1-5
 // https://www.bugcrowd.com/blog/vulnerability-prioritization-at-bugcrowd/
@@ -19,7 +20,7 @@ function getSeverity(priority: number) {
   return PRIORITY_TO_SEVERITY_MAP.get(priority) || 'critical';
 }
 
-export function createBountyEntity(data: any): Entity {
+export function createBountyEntity(data: Bounty): Entity {
   return createIntegrationEntity({
     entityData: {
       source: data,
@@ -47,7 +48,7 @@ export function createBountyEntity(data: any): Entity {
   });
 }
 
-export function createBountySubmissionEntity(data: any) {
+export function createBountySubmissionEntity(data: BountySubmission) {
   return createIntegrationEntity({
     entityData: {
       source: data,
@@ -73,7 +74,7 @@ export function createBountySubmissionEntity(data: any) {
         target: data.target?.name,
         rewards: data.monetary_rewards?.map((r) => r.amount),
         totalAmountAwarded: data.monetary_rewards?.reduce(
-          (a, b) => a.amount + b.amount,
+          (a, b) => a + b.amount,
           0,
         ),
       },

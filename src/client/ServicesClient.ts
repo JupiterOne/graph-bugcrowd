@@ -1,15 +1,28 @@
 import { retry } from '@lifeomic/attempt';
-import nodeFetch, { Request, Response } from 'node-fetch';
+import nodeFetch, { Response } from 'node-fetch';
 
 import { retryableRequestError, fatalRequestError } from './error';
-import { URLSearchParams } from 'url';
+import { URLSearchParams, URL } from 'url';
+import { Bounty, BountySubmission } from '../types';
 
 export interface ServicesClientInput {
   apiToken: string;
 }
 
-interface QueryParam {
-  [param: string]: string | string[];
+interface BugcrowdPaginationQueryParams {
+  offset?: string;
+  limit?: string;
+}
+
+interface BugcrowdResponsePagination {
+  offset: number;
+  limit?: number;
+  count: number;
+  total_hits: number;
+}
+
+interface BugcrowdResponseBase {
+  meta: BugcrowdResponsePagination;
 }
 
 const BASE_URL = 'https://api.bugcrowd.com/';
@@ -19,11 +32,9 @@ const BASE_URL = 'https://api.bugcrowd.com/';
  * https://docs.bugcrowd.com/reference
  */
 export class ServicesClient {
-  readonly baseUrl: string;
   readonly authHeader: { [key: string]: string };
 
   constructor(config: ServicesClientInput) {
-    this.baseUrl = BASE_URL;
     this.authHeader = {
       Authorization: `Token ${config.apiToken}`,
       Accept: 'application/vnd.bugcrowd+json',
@@ -34,46 +45,88 @@ export class ServicesClient {
     return this.fetch('bounties', { offset: '0', limit: '1' });
   }
 
-  async iterateBounties(fn: (bounty: any) => Promise<void>): Promise<void> {
-    const result = await this.fetch<any>('bounties');
+  async iterateBounties(
+    fn: (bounty: any) => Promise<void>,
+    options?: { limit?: number },
+  ): Promise<void> {
+    const limit = options?.limit?.toString() || undefined;
+    let offset: string | undefined = undefined;
+    do {
+      const result = await this.fetch<
+        BugcrowdResponseBase & { bounties: Bounty[] }
+      >('bounties', { offset, limit });
 
-    for (const bounty of result.bounties) {
-      await fn(bounty);
-    }
+      for (const bounties of result.bounties) {
+        await fn(bounties);
+      }
+
+      if (this.hasNextPage(result.meta)) {
+        offset = this.getNextOffset(result.meta);
+      } else {
+        offset = undefined;
+      }
+    } while (offset != undefined);
   }
 
   async iterateBountySubmissions(
     bountyId: string,
     fn: (submission: any) => Promise<void>,
   ): Promise<void> {
-    const result = await this.fetch<any>(`bounties/${bountyId}/submissions/`);
+    let offset: string | undefined = undefined;
+    do {
+      const result = await this.fetch<
+        BugcrowdResponseBase & { submissions: BountySubmission[] }
+      >(`bounties/${bountyId}/submissions/`, { offset });
 
-    for (const submission of result.submissions) {
-      await fn(submission);
+      for (const submission of result.submissions) {
+        await fn(submission);
+      }
+
+      if (this.hasNextPage(result.meta)) {
+        offset = this.getNextOffset(result.meta);
+      } else {
+        offset = undefined;
+      }
+    } while (offset != undefined);
+  }
+
+  private hasNextPage(meta?: BugcrowdResponsePagination): boolean {
+    if (meta) {
+      return meta.total_hits > meta.count + meta.offset;
+    }
+    return false;
+  }
+
+  private getNextOffset(meta?: BugcrowdResponsePagination): string | undefined {
+    if (meta) {
+      return (meta.offset + meta.count).toString();
     }
   }
 
-  fetch<T>(
-    url: string,
-    queryParams: QueryParam = {},
-    request?: Omit<Request, 'url'>,
-  ): Promise<T> {
+  async fetch<TResponse extends BugcrowdResponseBase>(
+    endpoint: string,
+    queryParams: BugcrowdPaginationQueryParams,
+  ): Promise<TResponse> {
+    const qs = new URLSearchParams();
+    if (queryParams?.limit) {
+      qs.append('limit', queryParams.limit);
+    }
+    if (queryParams?.offset) {
+      qs.append('offset', queryParams.offset);
+    }
+
+    const url = new URL(endpoint, BASE_URL);
+    url.search = qs.toString();
     return retry(
       async () => {
-        const qs = new URLSearchParams(queryParams).toString();
-        const response = await nodeFetch(
-          `${BASE_URL}${url}${qs ? '?' + qs : ''}`,
-          {
-            ...request,
-            headers: {
-              ...this.authHeader,
-              ...request?.headers,
-            },
+        const response = await nodeFetch(url, {
+          headers: {
+            ...this.authHeader,
           },
-        );
+        });
 
         if (response.ok) {
-          return (await response.json()) as T;
+          return (await response.json()) as TResponse;
         }
 
         if (isRetryableRequest(response)) {
