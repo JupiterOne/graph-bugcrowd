@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.4.0] - 2021-08-12
+
 ### Changed
 
 - Upgrade to latest dependencies
