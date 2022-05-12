@@ -71,7 +71,7 @@ export function createBountySubmissionEntity(data: BountySubmission) {
         severity: getSeverity(data.priority),
         webLink: data.bug_url,
         open: data.substate !== 'resolved',
-        target: data.target?.name,
+        targets: data.target?.name,
         rewards: data.monetary_rewards?.map((r) => r.amount),
         totalAmountAwarded: data.monetary_rewards?.reduce(
           (a, b) => a + b.amount,
