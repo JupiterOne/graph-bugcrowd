@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.4.1] - 2022-05-12
+
+- rename property `target` -> `targets` for BountySubmissionEntity
+
 ## [0.4.0] - 2021-08-12
 
 ### Changed
