@@ -30,6 +30,10 @@ If you need help with this integration, please contact
 1. To provision API access credentials, follow Bugcrowd's
    [API getting started guide](https://docs.bugcrowd.com/api/getting-started/)
 
+2. On the API credentials page, select "**Legacy**" in the "Default version"
+   dropdown. The JupiterOne Bugcrowd integration currently only supports the
+   legacy v3 Bugcrowd APIs.
+
 ### In JupiterOne
 
 1. From the configuration **Gear Icon**, select **Integrations**.
