@@ -19,6 +19,9 @@ const PRIORITY_TO_SEVERITY_MAP = new Map<number, string>([
 function getSeverity(priority: number) {
   return PRIORITY_TO_SEVERITY_MAP.get(priority) || 'critical';
 }
+function getReferences(references: string) {
+  return references ? references.replace(/\* /g, '').split(' \n ') : [];
+}
 
 export function createBountyEntity(data: Bounty): Entity {
   return createIntegrationEntity({
@@ -60,16 +63,17 @@ export function createBountySubmissionEntity(data: BountySubmission) {
         name: data.title,
         displayName: data.title,
         category: 'bug-bounty',
-        description: data.description_markdown,
+        description: data.description_markdown || undefined,
         descriptionMarkdown: undefined,
         details: data.extra_info_markdown,
         extraInfoMarkdown: undefined,
         createdOn: parseTimePropertyValue(data.submitted_at),
-        references: data.vulnerability_references_markdown,
+        references: getReferences(data.vulnerability_references_markdown),
         vulnerabilityReferencesMarkdown: undefined,
-        numericSeverity: data.priority,
+        numericSeverity: data.priority || 5,
         severity: getSeverity(data.priority),
-        webLink: data.bug_url,
+        webLink:
+          data.bug_url ?? `https://tracker.bugcrowd.com/${data.bounty.code}`,
         open: data.substate !== 'resolved',
         targets: data.target?.name,
         rewards: data.monetary_rewards?.map((r) => r.amount),

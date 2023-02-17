@@ -1,0 +1,5 @@
+---
+sourceId: managed:bugcrowd
+integrationDefinitionId: '${integration_definition_id}'
+questions:
+  []

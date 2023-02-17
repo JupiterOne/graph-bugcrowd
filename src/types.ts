@@ -8,6 +8,7 @@ export interface BountySubmission {
   priority: number;
   bug_url: string;
   substate: string;
+  bounty: Bounty;
   target: {
     name: string;
   };

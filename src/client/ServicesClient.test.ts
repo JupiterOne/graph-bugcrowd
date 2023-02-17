@@ -1,5 +1,5 @@
 import { config } from '../../test/config';
-import { Recording, setupBugcrowdRecording } from '../../test/recording';
+import { Recording, setupProjectRecording } from '../../test/recording';
 import { ServicesClient } from './ServicesClient';
 
 let recording: Recording;
@@ -15,7 +15,7 @@ const cb = async () => {};
 
 describe('ServicesClient', () => {
   test('should fetch multiple pages from API', async () => {
-    recording = setupBugcrowdRecording({
+    recording = setupProjectRecording({
       directory: __dirname,
       name: 'ServicesClient-pagination',
     });
