@@ -8,6 +8,14 @@ and this project adheres to
 
 ## [Unreleased]
 
+- Upgraded SDK dependencies to v8
+- Updated build.yml
+- Updated package.json main, types, and files to work with updated build.yml
+- Updated project [README.md](http://README.md '‌')
+- Added jupiterone/questions/questions.yaml file
+- Upgraded package.json scripts to match an `integration-template`
+- Updated tests to use latest patterns
+
 ## [1.0.0] - 2022-05-13
 
 - BREAKING: rename property `target` -> `targets` for BountySubmissionEntity
