@@ -2,6 +2,10 @@
   "name": "@jupiterone/graph-bugcrowd",
   "version": "1.0.0",
   "description": "A graph conversion tool for https://bugcrowd.com/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JupiterOne/graph-bugcrowd"
+  },
   "license": "MPL-2.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
